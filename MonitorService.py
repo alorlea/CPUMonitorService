@@ -12,33 +12,52 @@ from flask.ext.httpauth import HTTPBasicAuth
 app = Flask(__name__, static_url_path = "")
 api = Api(app)
 
+auth = HTTPBasicAuth()
+ 
+@auth.get_password
+def get_password(username):
+    if username == 'FilesFromYou':
+        return 'YouFromFiles'
+    return None
+ 
+@auth.error_handler
+def unauthorized():
+    return make_response(jsonify( { 'message': 'Unauthorized access' } ), 403)
+    # return 403 instead of 401 to prevent browsers from displaying the default auth dialog
+    
+
 devices=[
          {'id':1,
-          'load': '50.0',
+          'cpu': '50.0',
+          'load':'[0.3,0.6,0.7]',
           'device': 'Samsung Galaxy S3'
           },
          {'id':2,
-          'load': '30.0',
+          'cpu': '30.0',
+          'load': '[0.3,0.6,0.7]',
           'device': 'iPhone'
           },
          {'id':3,
-          'load': '70.0',
+          'cpu': '70.0',
+          'load': '[0.3,0.6,0.7]',
           'device': 'NokiaLumia920'
           }
 ]
 
 device_fields = {
                  'load':fields.String,
+                 'cpu': fields.String,
                  'device': fields.String,
                  'uri':fields.Url('device')
 }
 
 class DeviceListAPI(Resource):
-    
+    decorators = [auth.login_required]
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('load', type = str, required = True, location = 'json')
         self.reqparse.add_argument('device', type = str, required = True, location = 'json')
+        self.reqparse.add_argument('cpu',type=str,required = True, location = 'json')
         
         super(DeviceListAPI,self).__init__()
         
@@ -50,18 +69,19 @@ class DeviceListAPI(Resource):
         device = {
                   'id': devices[-1]['id'] + 1,
                   'load': args['load'],
-                  'device': args['device']
+                  'device': args['device'],
+                  'cpu': args['cpu']
         }
         devices.append(device)
         return {'device': marshal(device,device_fields)}, 201
 
 class DeviceAPI(Resource):
-    
+    decorators = [auth.login_required]
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('load', type = str, location='json')
         self.reqparse.add_argument('device', type = str, location='json')
-        
+        self.reqparse.add_argument('cpu',type=str, location = 'json')
         super(DeviceAPI,self).__init__()
         
     def get(self,id):
@@ -78,7 +98,7 @@ class DeviceAPI(Resource):
         args = self.reqparse.parse_args()
         device['load'] = args.get('load', device['load'])
         device['device'] = args.get('device',device['device'])
-        
+        device['cpu'] = args.get('cpu',device['cpu'])
         return {'device': marshal(device, device_fields)}
     
     def delete(self,id):

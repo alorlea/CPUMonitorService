@@ -4,20 +4,21 @@ Created on Nov 23, 2013
 
 @author: alberto lorente leal <albll@kth.se>,<a.lorenteleal@gmail.com>
 '''
-
+from sys import argv
 import os
 import time
 import requests
 import json
+import multiprocessing
 
+script, device = argv
 endpoint='http://localhost:5000'
 server_url=endpoint + '/CPUMonitor/api/v0.1/devices'
 period = 5
 user = 'FilesFromYou'
 password = 'YouFromFiles'
 device_uri= ''
-load = 0
-
+cores = multiprocessing.cpu_count()
 class Register:
     def __init__(self):
         while True:
@@ -28,9 +29,12 @@ class Register:
             
     @staticmethod
     def registerDevice():
-        payload={'load':'50','device':'test'}
+
+        load = os.getloadavg()
+        payload={'cpu':(load[0]/cores)*100,'load':load,'device':device}
         headers = {'content-type': 'application/json'}
-        response = requests.post(server_url,data=json.dumps(payload),headers=headers)
+        auth = (user, password)
+        response = requests.post(server_url,data=json.dumps(payload),auth=auth,headers=headers)
         print response.json()
         if response.status_code == 201:
             json_data = response.json()
@@ -49,16 +53,15 @@ class CPUHeartbeat:
         
     @staticmethod
     def sendCPU():
-        global load
-        load= load +period
-        payload={'load':load,'device':'test'}
+        load = os.getloadavg()
+        
+        payload={'cpu':(load[0]/cores)*100,'load':load,'device':device}
         headers = {'content-type': 'application/json'}
+        auth = (user, password)
         print device_uri
-        response = requests.put(device_uri,data=json.dumps(payload),headers=headers)
+        response = requests.put(device_uri,data=json.dumps(payload),auth=auth,headers=headers)
         if response.status_code == 200:
             print 'updated the value in the database'
         
-    
-
 Register()
 CPUHeartbeat()
