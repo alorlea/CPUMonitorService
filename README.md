@@ -26,6 +26,7 @@ To do this on linux run for the monitor Service:
 -flask/bin/pip install flask-httpauth
 
 To launch service:
+
 -flask/bin/python MonitorService.py
 
 For the agent do similar:
@@ -34,7 +35,9 @@ For the agent do similar:
 -flask/bin/pip install requests
 
 To run the agent:
+
 -flask/bin/python monitorAgent/cpuAgent.py [name-of-device]
 
 Once the service is running, you can access the website on:
+
 http://localhost:5000/index.html
