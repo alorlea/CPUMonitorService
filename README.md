@@ -42,7 +42,7 @@ Once the service is running, you can access the website on:
 
 http://localhost:5000/index.html
 
-user:admin
-pass:admin
+NOTE: A simple login and authentication mechanism is available, it is disabled to simplify access
+If you reenable the authentication in the service, uncomment the segments of code refering to auth in both service and agent. Uncomment the corresponding parts for the client in static/index.html
 
-NOTE: A simple login and authentication mechanism is available, it is possible to disable it to simplify access
+Credentials are user: admin, pass: admin
