@@ -37,7 +37,7 @@ api = Api(app)
 #    return make_response(jsonify( { 'message': 'Unauthorized access' } ), 403)
     # return 403 instead of 401 to prevent browsers from displaying the default auth dialog
     
-
+#Dummy data for testing purposes
 devices=[
          {'id':1,
           'cpu': '50.0',
