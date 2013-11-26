@@ -41,3 +41,8 @@ To run the agent:
 Once the service is running, you can access the website on:
 
 http://localhost:5000/index.html
+
+user:admin
+pass:admin
+
+NOTE: A simple login and authentication mechanism is available, it is possible to disable it to simplify access
